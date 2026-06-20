@@ -11,7 +11,13 @@ const PORT = 3001;
 app.use(helmet());
 app.use(express.json());
 
-const whitelist = ['http://localhost:3000', 'https://safeai.report', 'https://certichain.eu'];
+const whitelist = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://safeai.report',
+  'https://certichain.eu',
+  process.env.FRONTEND_URL,
+].filter(Boolean) as string[];
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -63,3 +69,5 @@ app.post('/api/v1/ledger/log-compliance', apiLimiter, async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`🚀 WaqfLedger Core API listening on port ${PORT}`));
+
+export default app;

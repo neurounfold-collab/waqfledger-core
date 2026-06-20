@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 interface MetricCardProps {
   label: string;
   value: string;
@@ -170,19 +172,6 @@ const ECOSYSTEM_CARDS = [
   },
 ];
 
-const CURL_SNIPPET = `curl -X POST https://api.waqfledger.tech/api/v1/ledger/log-compliance \\
-  -H "Content-Type: application/json" \\
-  -H "Origin: https://safeai.report" \\
-  -d '{
-    "trackType": "ARTICLE_4",
-    "targetOrganization": "Institutional Partner EU",
-    "payloadData": {
-      "assessmentId": "SCENARIO-28",
-      "completionDate": "2026-06-15",
-      "oversightScore": 97.2
-    }
-  }'`;
-
 function MetricCard({ label, value, delta, icon }: MetricCardProps) {
   return (
     <div className="group relative overflow-hidden rounded-xl border border-navy-700 bg-navy-900/80 p-5 shadow-panel transition-all hover:border-emerald-accent/40 hover:shadow-emerald">
@@ -250,6 +239,23 @@ function TrackColumn({ title, subtitle, accentClass, entries }: TrackColumnProps
 export default function Dashboard() {
   const lastSync = useMemo(
     () => new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+    [],
+  );
+
+  const curlSnippet = useMemo(
+    () =>
+      `curl -X POST ${API_BASE_URL}/api/v1/ledger/log-compliance \\
+  -H "Content-Type: application/json" \\
+  -H "Origin: https://safeai.report" \\
+  -d '{
+    "trackType": "ARTICLE_4",
+    "targetOrganization": "Institutional Partner EU",
+    "payloadData": {
+      "assessmentId": "SCENARIO-28",
+      "completionDate": "2026-06-15",
+      "oversightScore": 97.2
+    }
+  }'`,
     [],
   );
 
@@ -357,7 +363,7 @@ export default function Dashboard() {
                 </span>
               </div>
               <pre className="scrollbar-thin overflow-x-auto p-4 font-mono text-xs leading-relaxed text-slate-300">
-                <code>{CURL_SNIPPET}</code>
+                <code>{curlSnippet}</code>
               </pre>
               <div className="border-t border-navy-700 px-4 py-3">
                 <p className="text-xs leading-relaxed text-slate-500">
