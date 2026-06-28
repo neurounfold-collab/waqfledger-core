@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { type LegalContentType } from './components/LegalModal';
+import PaymentModal from './components/PaymentModal';
 
 interface DashboardProps {
   onOpenLegalModal: (type: LegalContentType) => void;
@@ -179,6 +180,7 @@ interface ConsortiumTier {
   head: string;
   subhead: string;
   price: string;
+  cta: string;
 }
 
 const CONSORTIUM_TIERS: ConsortiumTier[] = [
@@ -188,6 +190,7 @@ const CONSORTIUM_TIERS: ConsortiumTier[] = [
     subhead:
       'For university pipelines and research units mapping foundational literacy frameworks.',
     price: '€0 / Free Access',
+    cta: 'Request Pilot Enrollment',
   },
   {
     category: 'Institutional Consortium Member',
@@ -195,6 +198,7 @@ const CONSORTIUM_TIERS: ConsortiumTier[] = [
     subhead:
       'For mid-tier institutional bodies and educational centers executing active peer-benchmarking streams.',
     price: '€499 / month',
+    cta: 'Activate & Settle Online',
   },
   {
     category: 'Sovereign Governance',
@@ -202,8 +206,15 @@ const CONSORTIUM_TIERS: ConsortiumTier[] = [
     subhead:
       'For international regulatory bodies, state entities, and enterprise-scale audit networks requiring custom volume quotas.',
     price: 'Custom Contribution',
+    cta: 'Query Custom Quota',
   },
 ];
+
+const ACADEMIC_PILOT_MAILTO =
+  'mailto:enrollment@waqfledger.tech?subject=Academic%20Pilot%20Access%20Request';
+
+const SOVEREIGN_GOVERNANCE_MAILTO =
+  'mailto:procurement@waqfledger.tech?subject=Sovereign%20Governance%20Custom%20Quota%20Query%20%E2%80%94%20Global%20Capital%20Intelligence%20LLC';
 
 function MetricCard({ label, value, delta, icon }: MetricCardProps) {
   return (
@@ -270,12 +281,31 @@ function TrackColumn({ title, subtitle, accentClass, entries }: TrackColumnProps
 }
 
 export default function Dashboard({ onOpenLegalModal }: DashboardProps) {
+  const [isPayOpen, setIsPayOpen] = useState(false);
+  const [selectedTier, setSelectedTier] = useState('');
+
   const lastSync = useMemo(
     () => new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
     [],
   );
 
+  const handleTierAction = (category: string) => {
+    switch (category) {
+      case 'Academic & Research Pilot':
+        window.location.href = ACADEMIC_PILOT_MAILTO;
+        break;
+      case 'Institutional Consortium Member':
+        setSelectedTier('Institutional Consortium Member');
+        setIsPayOpen(true);
+        break;
+      case 'Sovereign Governance':
+        window.location.href = SOVEREIGN_GOVERNANCE_MAILTO;
+        break;
+    }
+  };
+
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-navy-950 via-navy-900 to-navy-950">
       {/* Header */}
       <header className="border-b border-navy-700/80 bg-navy-950/90 backdrop-blur-sm">
@@ -405,6 +435,17 @@ export default function Dashboard({ onOpenLegalModal }: DashboardProps) {
                   <h3 className="mt-2 text-sm font-semibold text-emerald-glow">{tier.head}</h3>
                   <p className="mt-2 text-xs leading-relaxed text-slate-400">{tier.subhead}</p>
                   <p className="mt-3 text-sm font-bold tracking-tight text-white">{tier.price}</p>
+                  <button
+                    type="button"
+                    onClick={() => handleTierAction(tier.category)}
+                    className={`mt-4 w-full rounded-lg px-4 py-2.5 text-xs font-semibold transition-colors ${
+                      tier.category === 'Institutional Consortium Member'
+                        ? 'border border-emerald-accent/40 bg-emerald-accent/15 text-emerald-glow hover:border-emerald-accent/60 hover:bg-emerald-accent/25'
+                        : 'border border-navy-700 bg-navy-900/60 text-slate-300 hover:border-emerald-accent/30 hover:bg-navy-800 hover:text-white'
+                    }`}
+                  >
+                    {tier.cta}
+                  </button>
                 </div>
               ))}
             </div>
@@ -460,5 +501,11 @@ export default function Dashboard({ onOpenLegalModal }: DashboardProps) {
         </footer>
       </main>
     </div>
+    <PaymentModal
+      isOpen={isPayOpen}
+      onClose={() => setIsPayOpen(false)}
+      tierName={selectedTier}
+    />
+    </>
   );
 }
