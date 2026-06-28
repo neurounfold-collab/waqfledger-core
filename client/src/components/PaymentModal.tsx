@@ -222,10 +222,10 @@ export default function PaymentModal({ isOpen, onClose, tierName }: PaymentModal
             For customized pro-forma invoices, vendor registration packets, or official purchase order
             coordination, please query our billing office directly at{' '}
             <a
-              href="mailto:procurement@waqfledger.tech"
+              href="mailto:contact@waqfledger.tech"
               className="font-medium text-slate-400 underline decoration-slate-600 underline-offset-2 transition-colors hover:text-emerald-glow hover:decoration-emerald-accent/40"
             >
-              procurement@waqfledger.tech
+              contact@waqfledger.tech
             </a>
             .
           </p>

@@ -93,7 +93,7 @@ const LEGAL_CONTENT: Record<
       {
         heading: '8. Contact & DPO',
         body:
-          'Privacy inquiries may be directed to privacy@waqfledger.tech. Institutional partners requiring a formal Data Processing Agreement should reference the DPA module accessible from this footer or contact dpa@waqfledger.tech.',
+          'Privacy inquiries and Data Processing Agreement requests may be directed to contact@waqfledger.tech. Institutional partners requiring a formal DPA should reference the DPA module accessible from this footer.',
       },
     ],
   },

@@ -211,10 +211,10 @@ const CONSORTIUM_TIERS: ConsortiumTier[] = [
 ];
 
 const ACADEMIC_PILOT_MAILTO =
-  'mailto:enrollment@waqfledger.tech?subject=Academic%20Pilot%20Access%20Request';
+  'mailto:contact@waqfledger.tech?subject=Academic%20Pilot%20Access%20Request';
 
 const SOVEREIGN_GOVERNANCE_MAILTO =
-  'mailto:procurement@waqfledger.tech?subject=Sovereign%20Governance%20Custom%20Quota%20Query%20%E2%80%94%20Global%20Capital%20Intelligence%20LLC';
+  'mailto:contact@waqfledger.tech?subject=Sovereign%20Governance%20Custom%20Quota%20Query%20%E2%80%94%20Global%20Capital%20Intelligence%20LLC';
 
 function MetricCard({ label, value, delta, icon }: MetricCardProps) {
   return (
