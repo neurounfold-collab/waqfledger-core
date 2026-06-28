@@ -1,6 +1,23 @@
 import { useMemo } from 'react';
+import { type LegalContentType } from './components/LegalModal';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+interface DashboardProps {
+  onOpenLegalModal: (type: LegalContentType) => void;
+}
+
+const CURL_INTEGRATION_SNIPPET = `curl -X POST https://api.waqfledger.tech/api/v1/ledger/log-compliance \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer YOUR_CONSORTIUM_API_KEY" \\
+  -H "Origin: https://your-authorized-domain.com" \\
+  -d '{
+    "trackType": "ARTICLE_4",
+    "targetOrganization": "Institutional Partner EU",
+    "payloadData": {
+      "assessmentId": "SCENARIO-28",
+      "completionDate": "2026-06-28",
+      "oversightScore": 97.2
+    }
+  }'`;
 
 interface MetricCardProps {
   label: string;
@@ -157,18 +174,34 @@ const ACADEMIC_TRACK_ENTRIES: LogEntry[] = [
   },
 ];
 
-const ECOSYSTEM_CARDS = [
+interface ConsortiumTier {
+  category: string;
+  head: string;
+  subhead: string;
+  price: string;
+}
+
+const CONSORTIUM_TIERS: ConsortiumTier[] = [
   {
-    title: 'Tokenless Sovereign Anchoring',
-    body: 'Institutions log compliance metadata without wallet infrastructure. Deterministic SHA-256 proofs replace on-chain gas overhead while preserving immutability semantics.',
+    category: 'Academic & Research Pilot',
+    head: 'Sponsored Open Access',
+    subhead:
+      'For university pipelines and research units mapping foundational literacy frameworks.',
+    price: '€0 / Free Access',
   },
   {
-    title: 'Viral Scale via API Gateway',
-    body: 'A single POST endpoint enables B2B partners to embed WaqfLedger receipts into LMS, HRIS, and GRC platforms — driving network effects with near-zero integration cost.',
+    category: 'Institutional Consortium Member',
+    head: 'Core Benchmarking Membership',
+    subhead:
+      'For mid-tier institutional bodies and educational centers executing active peer-benchmarking streams.',
+    price: '€499 / month',
   },
   {
-    title: 'Zero-Knowledge Trust Layer',
-    body: 'Payload data is hashed client-side; only cryptographic proofs and organizational metadata traverse the ledger. Sensitive model parameters never leave sovereign boundaries.',
+    category: 'Sovereign Governance',
+    head: 'Global Compliance Partner',
+    subhead:
+      'For international regulatory bodies, state entities, and enterprise-scale audit networks requiring custom volume quotas.',
+    price: 'Custom Contribution',
   },
 ];
 
@@ -236,26 +269,9 @@ function TrackColumn({ title, subtitle, accentClass, entries }: TrackColumnProps
   );
 }
 
-export default function Dashboard() {
+export default function Dashboard({ onOpenLegalModal }: DashboardProps) {
   const lastSync = useMemo(
     () => new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
-    [],
-  );
-
-  const curlSnippet = useMemo(
-    () =>
-      `curl -X POST ${API_BASE_URL}/api/v1/ledger/log-compliance \\
-  -H "Content-Type: application/json" \\
-  -H "Origin: https://safeai.report" \\
-  -d '{
-    "trackType": "ARTICLE_4",
-    "targetOrganization": "Institutional Partner EU",
-    "payloadData": {
-      "assessmentId": "SCENARIO-28",
-      "completionDate": "2026-06-15",
-      "oversightScore": 97.2
-    }
-  }'`,
     [],
   );
 
@@ -363,7 +379,7 @@ export default function Dashboard() {
                 </span>
               </div>
               <pre className="scrollbar-thin overflow-x-auto p-4 font-mono text-xs leading-relaxed text-slate-300">
-                <code>{curlSnippet}</code>
+                <code>{CURL_INTEGRATION_SNIPPET}</code>
               </pre>
               <div className="border-t border-navy-700 px-4 py-3">
                 <p className="text-xs leading-relaxed text-slate-500">
@@ -376,30 +392,69 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* explanation cards */}
+            {/* Open-Access Consortium tiers */}
             <div className="flex flex-col gap-4">
-              {ECOSYSTEM_CARDS.map((card) => (
+              {CONSORTIUM_TIERS.map((tier) => (
                 <div
-                  key={card.title}
+                  key={tier.category}
                   className="rounded-xl border border-navy-700 bg-navy-950/50 p-4 transition-colors hover:border-emerald-accent/20"
                 >
-                  <h3 className="text-sm font-semibold text-emerald-glow">{card.title}</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-slate-400">{card.body}</p>
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                    {tier.category}
+                  </p>
+                  <h3 className="mt-2 text-sm font-semibold text-emerald-glow">{tier.head}</h3>
+                  <p className="mt-2 text-xs leading-relaxed text-slate-400">{tier.subhead}</p>
+                  <p className="mt-3 text-sm font-bold tracking-tight text-white">{tier.price}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-navy-700/60 pt-6 sm:flex-row">
-            <p className="text-xs text-slate-500">
-              WaqfLedger.tech · Cryptographic compliance logging for EU AI Act Article 4 &amp; 11
+          <div className="mt-8 flex flex-col gap-4 border-t border-navy-700/60 pt-6">
+            <p className="text-center text-xs text-slate-500 sm:text-left">
+              WaqfLedger.tech • Cryptographic compliance logging and peer benchmarking for EU AI
+              Act Article 4 &amp; 11.
             </p>
-            <div className="flex gap-4 text-xs text-slate-500">
-              <span>safeAI.report</span>
-              <span>·</span>
-              <span>certichain.eu</span>
-              <span>·</span>
-              <span className="text-emerald-accent/80">Zero-Knowledge · Tokenless · Sovereign</span>
+            <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-slate-500 sm:justify-start">
+                <span>safeAI.report</span>
+                <span aria-hidden="true">·</span>
+                <span>certichain.eu</span>
+                <span aria-hidden="true">·</span>
+                <span className="text-emerald-accent/80">Zero-Knowledge · Tokenless · Sovereign</span>
+              </div>
+              <nav
+                className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 sm:justify-end"
+                aria-label="Consortium legal and compliance"
+              >
+                <button
+                  type="button"
+                  onClick={() => onOpenLegalModal('terms')}
+                  className="text-[11px] text-slate-500/50 transition-colors hover:text-slate-400/80"
+                >
+                  Terms of Consortium
+                </button>
+                <span aria-hidden="true" className="text-[11px] text-slate-600/40">
+                  ·
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onOpenLegalModal('privacy')}
+                  className="text-[11px] text-slate-500/50 transition-colors hover:text-slate-400/80"
+                >
+                  Privacy &amp; GDPR Policy (Zero-Knowledge Client-Side Hashing)
+                </button>
+                <span aria-hidden="true" className="text-[11px] text-slate-600/40">
+                  ·
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onOpenLegalModal('dpa')}
+                  className="text-[11px] text-slate-500/50 transition-colors hover:text-slate-400/80"
+                >
+                  Data Processing Agreement (DPA)
+                </button>
+              </nav>
             </div>
           </div>
         </footer>
