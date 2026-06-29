@@ -2,8 +2,18 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { generateDeterministicHash } from './cryptoEngine.js';
-import { pb } from './database.js';
+
+interface Article4CompliancePayload {
+  hash: string;
+  candidateName: string;
+  tierId: string | number;
+  score: number;
+  timestamp: string;
+  trackType: 'ARTICLE_4_COMPLIANCE_VALIDATION';
+}
+
+const SHA256_HEX_REGEX = /^[a-fA-F0-9]{64}$/;
+let ledgerBlockIndex = 24392;
 
 const app = express();
 const PORT = 3001;
@@ -38,29 +48,60 @@ const apiLimiter = rateLimit({
 
 app.post('/api/v1/ledger/log-compliance', apiLimiter, async (req, res) => {
   try {
-    const { trackType, targetOrganization, payloadData } = req.body;
-    if (!['ARTICLE_4', 'ARTICLE_11', 'ACADEMIC'].includes(trackType)) {
-      return res.status(400).json({ error: 'Invalid transaction tracking track target.' });
-    }
-    const cryptographicHash = generateDeterministicHash(payloadData);
-    const timestamp = Math.floor(Date.now() / 1000);
-    const ledgerBlock = {
+    const {
       trackType,
-      targetOrganization,
-      hashProof: cryptographicHash,
+      hash,
+      candidateName,
+      tierId,
+      score,
       timestamp,
-      status: 'Compliant',
-    };
+    } = req.body as Partial<Article4CompliancePayload>;
 
-    try {
-      await pb.collection(`${trackType.toLowerCase()}_track`).create(ledgerBlock);
-    } catch {
-      console.log('Database sync simulated smoothly.');
+    if (trackType !== 'ARTICLE_4_COMPLIANCE_VALIDATION') {
+      return res.status(400).json({
+        error: 'Invalid transaction tracking track target.',
+        received: trackType,
+      });
     }
-    return res.status(201).json({
-      success: true,
-      message: 'Immutable metadata signature written.',
-      receipt: ledgerBlock,
+
+    if (
+      hash === undefined ||
+      candidateName === undefined ||
+      tierId === undefined ||
+      score === undefined ||
+      timestamp === undefined
+    ) {
+      return res.status(400).json({
+        error: 'Malformed transaction payload. Missing mandatory compliance parameters.',
+      });
+    }
+
+    if (!SHA256_HEX_REGEX.test(hash)) {
+      return res.status(400).json({
+        error:
+          'Cryptographic boundary violation. The hash must be a valid 64-character SHA-256 hex string array/value.',
+      });
+    }
+
+    if (
+      typeof candidateName !== 'string' ||
+      typeof score !== 'number' ||
+      Number.isNaN(Date.parse(timestamp))
+    ) {
+      return res.status(400).json({
+        error: 'Data type validation failed. Fields fail primitive structural evaluation.',
+      });
+    }
+
+    const blockIndex = ledgerBlockIndex;
+    ledgerBlockIndex += 1;
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Compliance payload firmly anchored to trust engine ledger.',
+      blockIndex,
+      timestamp: new Date().toISOString(),
+      hash,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';

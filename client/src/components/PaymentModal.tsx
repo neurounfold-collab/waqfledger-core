@@ -10,9 +10,12 @@ const WISE_SETTLEMENT_URL = 'https://wise.com/pay/r/R4VwHll_xibeZgc';
 
 const WIRE_DETAILS = [
   { label: 'Beneficiary', value: 'Global Capital Intelligence LLC' },
-  { label: 'Clearing Network', value: 'Wise Business / Settlement Hub' },
-  { label: 'IBAN / Account Number', value: '[ENTER_YOUR_WISE_IBAN_OR_ACCOUNT_HERE]' },
-  { label: 'BIC / SWIFT / Routing', value: '[ENTER_YOUR_WISE_BIC_OR_ROUTING_HERE]' },
+  {
+    label: 'Clearing Network / Bank Name',
+    value: 'Wise (Rue du Trône 100, 3rd floor, Brussels, 1050, Belgium)',
+  },
+  { label: 'IBAN / Account Number', value: 'BE55 9058 6521 4644' },
+  { label: 'BIC / SWIFT / Routing', value: 'TRWIBEB1XXX' },
 ] as const;
 
 function LockIcon({ className }: { className?: string }) {
